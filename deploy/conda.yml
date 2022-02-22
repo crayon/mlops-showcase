@@ -1,0 +1,9 @@
+dependencies:
+  - python=3.6.2
+  - scikit-learn
+  - numpy
+  - pandas
+  - pip:
+    - azureml-defaults==1.32.0
+    - azureml-opendatasets
+    - inference-schema[numpy-support]

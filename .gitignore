@@ -1,0 +1,11 @@
+# AzureML
+config.json
+
+# Pyenv
+.python-version
+
+# Data files
+data/
+
+# Visual Sudio Code
+.vscode

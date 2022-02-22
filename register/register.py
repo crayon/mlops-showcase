@@ -17,6 +17,7 @@ ws = run.experiment.workspace
 avail_model_list = Model.list(
   workspace=ws,
   name=args.model_name,
+  tags =[["is_prod", "true"]],
   latest=True
 )
 
@@ -33,13 +34,19 @@ if (prod_model is not None):
 		"New trained model {}: {}".format(args.metric, current_metric)
 	)
 
-	if (current_metric > prod_metric):
+	if (current_metric >= prod_metric):
 		print("New model performs better, registering model...")
+		is_prod = "true"
+		prod_model.update_tags_properties(
+			add_tags={"is_prod": "false"}
+		)
 	else:
 		print("New model performs worse or equal to current model, skipping registration.")
+		is_prod = "false"
 		run.parent.cancel()
 else:
 	print("This is first model created, registering...")
+	is_prod = "true"
 
 
 model = Model.register(
@@ -47,11 +54,12 @@ model = Model.register(
   model_path=(args.model + "/model.joblib"),
   model_name=args.model_name,
   tags={
-    "pipeline_run_id": run.parent.id,
-    "pipeline_run_number": run.parent.number,
-    "dataset_name": args.dataset_name,
-    "dataset_version": args.dataset_version,
-    args.metric : run.parent.get_metrics().get(args.metric)
+	"dataset_name": args.dataset_name,
+	"dataset_version": args.dataset_version,
+	"is_prod": is_prod,
+	"pipeline_run_id": run.parent.id,
+	"pipeline_run_number": run.parent.number,
+	args.metric : run.parent.get_metrics().get(args.metric)
   }
 )
 

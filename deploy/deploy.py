@@ -16,6 +16,7 @@ ws = run.experiment.workspace
 model = Model(
   workspace=ws,
   name=args.model_name,
+  tags = [["is_prod", "true"]],
 )
 
 env = Environment.from_conda_specification(

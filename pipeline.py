@@ -1,4 +1,3 @@
-from ast import arguments
 from azureml.core import Dataset, Datastore, Environment, Experiment, RunConfiguration, Workspace
 from azureml.core.compute import AmlCompute
 from azureml.pipeline.steps import PythonScriptStep
@@ -41,7 +40,6 @@ diabetes_dataset = diabetes_data.register(
 raw_data = diabetes_data.as_named_input("raw_data")
 train_data = PipelineData("train_data", datastore=datastore).as_dataset()
 test_data = PipelineData("test_data", datastore=datastore).as_dataset()
-scaler_file = PipelineData("scaler_file", datastore=datastore)
 model_file = PipelineData("model_file", datastore=datastore)
 register_deploy_dep = PipelineData("dependency", datastore=datastore)
 
@@ -51,7 +49,6 @@ step1 = PythonScriptStep(
   source_directory="./prep",
   script_name="prepare.py",
   arguments=[
-    "--scaler", scaler_file,
     "--test", test_data,
     "--train", train_data,
   ],
@@ -62,7 +59,6 @@ step1 = PythonScriptStep(
   outputs=[
     train_data,
     test_data,
-    scaler_file,
   ],
 )
 

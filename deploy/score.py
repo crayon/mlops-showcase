@@ -11,7 +11,7 @@ from inference_schema.parameter_types.pandas_parameter_type import PandasParamet
 def init():
     global model
     # Replace filename if needed.
-    path = os.getenv('AZUREML_MODEL_DIR') 
+    path = os.getenv('AZUREML_MODEL_DIR')
     model_path = os.path.join(path, 'model.joblib')
     # Deserialize the model file back into a sklearn model.
     model = joblib.load(model_path)
@@ -28,11 +28,14 @@ input_sample = pd.DataFrame(data=[{
     "S4": 3.1
 }])
 
-# This is an integer type sample. Use the data type that reflects the expected result.
+# This is an integer type sample. Use the data type that reflects the
+# expected result.
 output_sample = np.array([0])
 
 # To indicate that we support a variable length of data input,
 # set enforce_shape=False
+
+
 @input_schema('data', PandasParameterType(input_sample))
 @output_schema(NumpyParameterType(output_sample))
 def run(data):

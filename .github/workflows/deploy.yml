@@ -1,8 +1,11 @@
 name: deploy_to_azureml
 on:
   push:
-    branches: [ main ]
-
+    branches:
+    - main
+    paths-ignore:
+     - "README.md"
+     - "images/**"
 jobs:
   build:
     runs-on: ubuntu-latest

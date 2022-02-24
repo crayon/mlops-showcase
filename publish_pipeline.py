@@ -1,9 +1,18 @@
-from azureml.core import Dataset, Datastore, Environment, Experiment, RunConfiguration, Workspace
+import os
+from azureml.core import Dataset, Datastore, Environment, RunConfiguration, Workspace
+from azureml.core.authentication import ServicePrincipalAuthentication
 from azureml.core.compute import AmlCompute
 from azureml.pipeline.steps import PythonScriptStep
 from azureml.pipeline.core import PipelineData, Pipeline
 
 
+auth_resource_group = os.environ.get('AUTH_RESOURCE_GROUP')
+auth_sp_id = os.environ.get('AUTH_SP_ID')
+auth_sp_secret = os.environ.get('AUTH_SP_SECRET')
+auth_subscr_id = os.environ.get('AUTH_SUBSCR_ID')
+auth_tenant_id = os.environ.get('AUTH_TENANT_ID')
+auth_workspace_name = os.environ.get('AUTH_WORKSPACE_NAME')
+build_id = os.environ.get('GITHUB_RUN_ID')
 compute_name = "waicf-cluster"
 datastore_name = "waicfblobstorage"
 dataset_name = "waicf-diabetes"
@@ -14,7 +23,18 @@ metric = "score"
 model_name = "waicf-diabetes"
 pipeline_name = "waicf-pipeline"
 
-ws = Workspace.from_config(path="./")
+
+credentials = ServicePrincipalAuthentication(
+  tenant_id=auth_tenant_id,
+  service_principal_id=auth_sp_id,
+  service_principal_password=auth_sp_secret
+)
+ws = Workspace(
+  subscription_id=auth_subscr_id,
+  resource_group=auth_resource_group,
+  workspace_name=auth_workspace_name,
+  auth=credentials
+)
 env = Environment.from_conda_specification(env_name, "./conda.yml")
 compute_cluster = AmlCompute(
     workspace=ws,
@@ -119,6 +139,7 @@ step4 = PythonScriptStep(
 pipeline_steps = [step1, step2, step3, step4]
 
 pipeline = Pipeline(workspace=ws, steps=pipeline_steps)
-pipeline_run = Experiment(
-    ws, pipeline_name).submit(
-        pipeline, regenerate_outputs=False)
+published_pipeline = pipeline.publish(name=pipeline_name, version=build_id)
+
+print(f"Published pipeline: {published_pipeline.name}")
+print(f"for build {published_pipeline.version}")

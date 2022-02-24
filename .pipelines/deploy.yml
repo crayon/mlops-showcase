@@ -1,0 +1,38 @@
+name: deploy_to_azureml
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Initialize Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8.10
+      - name: Install dependencies
+        run: |
+          python --version
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+      - name: Publish training pipeline
+        run: python publish_pipeline.py
+        env:
+          AUTH_RESOURCE_GROUP: ${{ secrets.AUTH_RESOURCE_GROUP }}
+          AUTH_SP_ID: ${{ secrets.AUTH_SP_ID }}
+          AUTH_SP_SECRET: ${{ secrets.AUTH_SP_SECRET }}
+          AUTH_SUBSCR_ID: ${{ secrets.AUTH_SUBSCR_ID }}
+          AUTH_TENANT_ID: ${{ secrets.AUTH_TENANT_ID }}
+          AUTH_WORKSPACE_NAME: ${{ secrets.AUTH_WORKSPACE_NAME }}
+      - name: Trigger newly published pipeline
+        run: python run_pipeline.py
+        env:
+          AUTH_RESOURCE_GROUP: ${{ secrets.AUTH_RESOURCE_GROUP }}
+          AUTH_SP_ID: ${{ secrets.AUTH_SP_ID }}
+          AUTH_SP_SECRET: ${{ secrets.AUTH_SP_SECRET }}
+          AUTH_SUBSCR_ID: ${{ secrets.AUTH_SUBSCR_ID }}
+          AUTH_TENANT_ID: ${{ secrets.AUTH_TENANT_ID }}
+          AUTH_WORKSPACE_NAME: ${{ secrets.AUTH_WORKSPACE_NAME }}

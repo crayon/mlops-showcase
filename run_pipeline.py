@@ -14,33 +14,33 @@ build_id = os.environ.get('GITHUB_RUN_ID')
 pipeline_name = "waicf-pipeline"
 
 credentials = ServicePrincipalAuthentication(
-  tenant_id=auth_tenant_id,
-  service_principal_id=auth_sp_id,
-  service_principal_password=auth_sp_secret
+    tenant_id=auth_tenant_id,
+    service_principal_id=auth_sp_id,
+    service_principal_password=auth_sp_secret
 )
 ws = Workspace(
-  subscription_id=auth_subscr_id,
-  resource_group=auth_resource_group,
-  workspace_name=auth_workspace_name,
-  auth=credentials
+    subscription_id=auth_subscr_id,
+    resource_group=auth_resource_group,
+    workspace_name=auth_workspace_name,
+    auth=credentials
 )
 
 pipelines = PublishedPipeline.list(workspace=ws)
 matched_pipelines = []
 
 for p in pipelines:
-	if p.name == pipeline_name and p.version == build_id:
-		matched_pipelines.append(p)
+    if p.name == pipeline_name and p.version == build_id:
+        matched_pipelines.append(p)
 
 if(len(matched_pipelines) > 1):
-	published_pipeline = None
-	raise Exception(f"Multiple active pipelines are published for build {build_id}.")
+    published_pipeline = None
+    raise Exception(f"Multiple active pipelines are published for build {build_id}.")
 elif(len(matched_pipelines) == 0):
-	published_pipeline = None
-	raise KeyError(f"Unable to find a published pipeline for this build {build_id}")
+    published_pipeline = None
+    raise KeyError(f"Unable to find a published pipeline for this build {build_id}")
 else:
-	published_pipeline = matched_pipelines[0]
+    published_pipeline = matched_pipelines[0]
 
-	pipeline_run = Experiment(workspace=ws, name=pipeline_name).submit(published_pipeline, regenerate_outputs=False)
+    pipeline_run = Experiment(workspace=ws, name=pipeline_name).submit(published_pipeline, regenerate_outputs=False)
 
-	print("Pipeline run initiated ", pipeline_run.id)
+    print("Pipeline run initiated ", pipeline_run.id)

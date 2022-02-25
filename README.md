@@ -35,4 +35,4 @@ For reuability of GitHub Actions, following secrets have to be available within 
 * AUTH_WORKSPACE_NAME: AzureML workspace name
 
 ### Comments
-As mentioned, codebase is very basic with loads of posibilities for improvement. Reason for this is that the purpose of it is just to showcase some basic capabilities of AzureML and how to integrate very basic MLOps workflow into it.
+As mentioned, codebase is very basic with loads of possibilities for improvement. Reason for this is that the purpose of it is just to showcase some basic capabilities of AzureML and how to integrate very basic MLOps workflow into it.
